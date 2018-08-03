@@ -24,7 +24,7 @@ public class ParkingSlotDTOUtil {
 			
 			slotEventLog.setParkingSlot(parkingSlot);
 			slotEventLog.setStatus(parkingSlotDTO.getStatus());
-			slotEventLog.setEventTime(Timestamp.from(parkingSlotDTO.getTimestamp().toInstant()));
+			slotEventLog.setEventTimeStart(Timestamp.from(parkingSlotDTO.getTimestamp().toInstant()));
 		}
 		
 		return slotEventLog;

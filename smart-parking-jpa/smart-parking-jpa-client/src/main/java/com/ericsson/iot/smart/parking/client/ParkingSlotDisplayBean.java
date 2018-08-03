@@ -59,7 +59,7 @@ public class ParkingSlotDisplayBean {
                         
                         SlotEventLog eventLog = new SlotEventLog();
                         Timestamp eventTime = Timestamp.from(Instant.now());
-						eventLog.setEventTime(eventTime);
+						eventLog.setEventTimeStart(eventTime);
 						eventLog.setStatus(getRandomNumberInRange(0, 1) == 1);
 						eventLog.setParkingSlot(parkingSlot);
 						parkingSlotService.add(eventLog);
@@ -84,7 +84,7 @@ public class ParkingSlotDisplayBean {
         	 if (parkingSlotService != null) {
                  StringJoiner joiner = new StringJoiner("|");
                  for (SlotEventLog slotEventLog : parkingSlotService.listEvents()) {
-                     joiner.add(slotEventLog.getParkingSlot().getId()).add(slotEventLog.getEventTime().toString()).add(slotEventLog.getStatus().toString()).add("\n");
+                     joiner.add(slotEventLog.getParkingSlot().getId()).add(slotEventLog.getEventTimeStart().toString()).add(slotEventLog.getStatus().toString()).add("\n");
                  }
                  System.out.println("Event History:");
                  System.out.println(joiner.toString());

@@ -130,10 +130,16 @@ public class ParkingOperator {
         {
         	// update status
             ParkingSlotDTO parkingSlotDTO = new ParkingSlotDTO();
-            parkingSlotDTO.setLot("IN"+getRandomNumberInRange(0, 1));
-            parkingSlotDTO.setFloor(+getRandomNumberInRange(0, 3));
-            parkingSlotDTO.setRow(getRandomNumberInRange(0, 10));
-            parkingSlotDTO.setSlot(getRandomNumberInRange(0, 15)+(getRandomNumberInRange(0, 1)==0?"A":"B"));
+            parkingSlotDTO.setLot(getRandomNumberInRange(0, 1) == 0 ? "IN" :"OUT");
+            if (parkingSlotDTO.getLot() == "OUT") {
+            	parkingSlotDTO.setFloor(0);
+            	parkingSlotDTO.setRow(getRandomNumberInRange(0, 20));
+            	parkingSlotDTO.setSlot(getRandomNumberInRange(0, 10)+(getRandomNumberInRange(0, 1)==0?"A":"B"));
+			}else{
+				parkingSlotDTO.setFloor(getRandomNumberInRange(0, 1));
+				parkingSlotDTO.setRow(getRandomNumberInRange(0, 10));
+				parkingSlotDTO.setSlot(getRandomNumberInRange(0, 15)+(getRandomNumberInRange(0, 1)==0?"A":"B"));
+			}
             parkingSlotDTO.setStatus(getRandomNumberInRange(0, 1) == 1);
             parkingSlotDTO.setTimestamp(Date.from(Instant.now()));
             System.out.println("\n Call PUT id= " + parkingSlotDTO.getSlotId() + client.getBaseURI());

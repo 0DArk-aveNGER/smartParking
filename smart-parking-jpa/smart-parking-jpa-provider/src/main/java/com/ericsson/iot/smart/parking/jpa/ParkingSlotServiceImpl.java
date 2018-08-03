@@ -24,33 +24,39 @@ public class ParkingSlotServiceImpl implements ParkingSlotService {
     @Transactional(Transactional.TxType.SUPPORTS)
     @Override
     public void add(ParkingSlotStatus parkingSlotStatus) {
-    	System.out.println("Inside Update.");
         ParkingSlotStatus slotStatus = entityManager.find(ParkingSlotStatus.class, parkingSlotStatus.getParkingSlot().getId());
-        System.out.println("Entity Found =" + (slotStatus != null));
+        System.out.println("Slot " + parkingSlotStatus.getParkingSlot().getId()+ ((slotStatus != null) ? "" : " not") + " Found!");
         if (slotStatus != null) {
-        	System.out.println("Entity will be updated.");
         	slotStatus.setStatus(parkingSlotStatus.getStatus());
         	entityManager.merge(slotStatus);
-        	System.out.println("Entity has been updated.");
+        	System.out.println("Slot" + parkingSlotStatus.getId() + " has been updated.");
 		}else
 		{
-			System.out.println("Entity will be inserted.");
 			entityManager.persist(parkingSlotStatus);
-			System.out.println("Entity has been inserted.");
+			System.out.println("Slot" + parkingSlotStatus.getId() + " has been inserted.");
 		}
     }
     
     @Transactional(Transactional.TxType.SUPPORTS)
     @Override
     public void add(SlotEventLog slotEventLog) {
-    	System.out.println("Inside SlotEventLog Update.");
         ParkingSlot slot= entityManager.find(ParkingSlot.class, slotEventLog.getParkingSlot().getId());
         System.out.println("ParkingSlotStatus Found =" + (slot != null));
         if (slot != null) {
 			slotEventLog.setParkingSlot(slot);
 		}
-		System.out.println("slotEventLog will be inserted.");
-		entityManager.persist(slotEventLog);
+        
+        Query query = entityManager.createNativeQuery("SELECT s.* FROM SlotEventLog s, ParkingSlot p where p.id = :parkingSlotId and s.parkingSlotId = p.id and "
+        															+ " s.eventTimeStart = (SELECT max(se.eventTimeStart) FROM SlotEventLog se, ParkingSlot ps where ps.id = :parkingSlotId and se.parkingSlotId = ps.id )" 
+        															, SlotEventLog.class);
+        query.setParameter("parkingSlotId", slotEventLog.getParkingSlot().getId());
+         List<SlotEventLog> oldEventLogs = (List<SlotEventLog>) query.getResultList();
+         if (!oldEventLogs.isEmpty()) {
+        	 oldEventLogs.get(0).setEventTimeEnd(slotEventLog.getEventTimeStart());
+        	 entityManager.merge(oldEventLogs.get(0));
+		}
+        entityManager.persist(slotEventLog);
+        
 		System.out.println("slotEventLog has been inserted.");
     }
 
@@ -79,7 +85,7 @@ public class ParkingSlotServiceImpl implements ParkingSlotService {
         try {
             parkingSlotStatus = query.getSingleResult();
         } catch (NoResultException e) {
-            System.err.println(e);
+            System.err.println("There is status for slot" + id);
         }
         return parkingSlotStatus;
     }

@@ -20,7 +20,8 @@ public class SlotEventLog {
 	@JoinColumn(name="parkingSlotId",referencedColumnName="id")
 	private ParkingSlot parkingSlot;
 	
-	private Timestamp eventTime;
+	private Timestamp eventTimeStart;
+	private Timestamp eventTimeEnd;
 	private Boolean status;
 	
 	public Long getId() {
@@ -39,12 +40,12 @@ public class SlotEventLog {
 		this.parkingSlot = parkingSlot;
 	}
 	
-	public Timestamp getEventTime() {
-		return eventTime;
+	public Timestamp getEventTimeStart() {
+		return eventTimeStart;
 	}
 	
-	public void setEventTime(Timestamp eventTime) {
-		this.eventTime = eventTime;
+	public void setEventTimeStart(Timestamp eventTimeStart) {
+		this.eventTimeStart = eventTimeStart;
 	}
 	
 	public Boolean getStatus() {
@@ -53,5 +54,13 @@ public class SlotEventLog {
 	
 	public void setStatus(Boolean status) {
 		this.status = status;
+	}
+
+	public Timestamp getEventTimeEnd() {
+		return eventTimeEnd;
+	}
+
+	public void setEventTimeEnd(Timestamp eventTimeEnd) {
+		this.eventTimeEnd = eventTimeEnd;
 	}
 }

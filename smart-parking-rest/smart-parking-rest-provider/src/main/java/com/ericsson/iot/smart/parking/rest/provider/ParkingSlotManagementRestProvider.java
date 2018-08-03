@@ -19,6 +19,7 @@ import com.ericsson.iot.smart.parking.EntityStatus;
 import com.ericsson.iot.smart.parking.ParkingSlotDTO;
 import com.ericsson.iot.smart.parking.ParkingSlotManagement;
 import com.ericsson.iot.smart.parking.jpa.ParkingSlotService;
+import com.ericsson.iot.smart.parking.jpa.ParkingSlotStatus;
 import com.ericsson.iot.smart.parking.rest.util.ParkingSlotDTOUtil;
 
 @Path("/smartParking")
@@ -99,6 +100,10 @@ public class ParkingSlotManagementRestProvider implements ParkingSlotManagement 
     @PUT
     public void updateStatus(ParkingSlotDTO parkingSlotDTO) {
 //        parkingSlotDTOs.put(parkingSlotDTO.getSlotId(), parkingSlotDTO);
+    	ParkingSlotStatus parkingSlotStatus = parkingSlotService.get(parkingSlotDTO.getSlotId());
+    	if (parkingSlotStatus != null) {
+			parkingSlotDTO.setStatus(!parkingSlotStatus.getStatus());
+		}
         parkingSlotService.add(ParkingSlotDTOUtil.getParkingSlotStatus(parkingSlotDTO));
         parkingSlotService.add(ParkingSlotDTOUtil.getEventLog(parkingSlotDTO));
     }

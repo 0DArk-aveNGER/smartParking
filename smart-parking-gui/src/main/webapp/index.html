@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet"
+	href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+<script src="http://code.jquery.com/jquery-2.0.1.min.js"></script>
+<script
+	src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+
+<style>
+.available {
+	background-color: green;
+	color:white;
+}
+
+.occupied {
+	background-color: red;
+	color:white;
+}
+.noInfo{
+	background-color: gray;
+	color:white;
+}
+
+table {
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+td{
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+}
+
+</style>
+
+<script type="text/javascript">
+var baseURL = "http://localhost:8181/cxf/solution/smartParking"
+var blocks = ["a", "b", "c", "d", "e"];
+//Dynamically changes the theme of all UI elements on all pages,
+//also pages not yet rendered (enhanced) by jQuery Mobile.
+$.mobile.changeGlobalTheme = function(theme)
+{
+ // These themes will be cleared, add more
+ // swatch letters as needed.
+ var themes = " a b c d e";
+
+ // Updates the theme for all elements that match the
+ // CSS selector with the specified theme class.
+ function setTheme(cssSelector, themeClass, theme)
+ {
+     $(cssSelector)
+         .removeClass(themes.split(" ").join(" " + themeClass + "-"))
+         .addClass(themeClass + "-" + theme)
+         .attr("data-theme", theme);
+ }
+
+ // Add more selectors/theme classes as needed.
+ setTheme(".ui-mobile-viewport", "ui-overlay", theme);
+ setTheme("[data-role='page']", "ui-body", theme);
+ setTheme("[data-role='header']", "ui-bar", theme);
+ setTheme("[data-role='listview'] > li", "ui-bar", theme);
+ setTheme(".ui-btn", "ui-btn-up", theme);
+ setTheme(".ui-btn", "ui-btn-hover", theme);
+};
+
+function buildTable(parent, row, column){
+	var table = $("<table id=\""+ $(parent).attr("id").replace("tab","table") +"\"></table>");
+	$(parent).append(table);
+
+	for(i = 0; i < row; i++){
+		var tRow = $("<tr></tr>");
+		tRow.appendTo(table);
+		var rowT = i == 0 ? "A": "B";
+		for(j = 0; j < column; j++){
+			var tCol = $("<td id=\""+ $(table).attr("id").substring(0, $(table).attr("id").lastIndexOf("-")) + "-slot-"+ j + rowT +"\" style=\"noInfo\">" + j + rowT +"</td>");
+			tCol.appendTo(tRow);	
+		}		
+	}
+}
+
+function getSlots(row){
+	var splittedId = $(row).attr("id").split("-");
+	var rowId = splittedId[5];
+	var floorId = splittedId[3];
+	var lotId = splittedId[1];
+	var slotsURL = baseURL + "/lot/" + lotId + "/floor/" + floorId + "/row/" + rowId + "/slots";
+
+	$.ajax({
+		  url: slotsURL,
+		  type: "GET",
+		  contentType: "application/json",
+		  dataType: "json",
+		  success: function(data){
+			  var targetDiv = $("#tab-lot-" + lotId + "-floor-" + floorId + "-row-" + rowId + "-slots"); 
+			  if(!targetDiv.length){
+				targetDiv = $("<div id=\"tab-lot-" + lotId + "-floor-" + floorId + "-row-"+ rowId + "-slots\"" +" class=\"ui-body-d ui-content\"></div>");
+				targetDiv.appendTo($("#tab-lot-" + lotId + "-floor-" + floorId + "-rows"));
+			  }
+			  targetDiv.empty();
+			  
+				if(!jQuery.isEmptyObject(data)){
+					if(lotId == "IN"){
+						buildTable(targetDiv,2,15);
+					}else{
+						buildTable(targetDiv,2,10);
+					}
+					$.each(data, function(index, slot){
+						var rowNdx = slot.id.substr(slot.id.length-1,1);
+						$("#table-" + $(row).attr("id") + "-slot-"+slot.id).addClass(slot.status ? "available" : "occupied");
+					}
+					);
+				}
+		  },
+		  error: function(data){
+			  alert(data);
+		  }
+		}); 	
+}
+
+function getRows(floor){
+	var splittedId = $(floor).attr("id").split("-");
+	var floorId = splittedId[3];
+	var lotId = splittedId[1];
+	var rowsURL = baseURL + "/lot/" + lotId + "/floor/" + floorId + "/rows";
+
+	$.ajax({
+		  url: rowsURL,
+		  type: "GET",
+		  contentType: "application/json",
+		  dataType: "json",
+		  success: function(data){
+			  var targetDiv = $("#tab-lot-" + lotId + "-floor-" + floorId); 
+			  if(!targetDiv.length){
+				targetDiv = $("<div id=\"tab-lot-" + lotId + "-floor-" + floorId + "\"" +" class=\"ui-body-d ui-content\"></div>");
+				targetDiv.appendTo($("#tab-lot-"+ lotId +"-floors"))
+			  }
+			  targetDiv.empty();
+			  
+			  var rowsTab = $("<div id=\"tab-lot-" + lotId + "-floor-" + floorId + "-rows\"" +" data-role=\"tabs\"></div>");
+			  rowsTab.appendTo(targetDiv);
+
+			  var rowsNavBar = $("<div id=\"lot-" + lotId + "-floor-" + floorId + "-rows\" data-role=\"navbar\"></div>");
+			  rowsNavBar.appendTo(rowsTab);
+			  
+			  var ul = $("<ul class=\"ui-grid-d\"></ul>");
+			  rowsNavBar.append(ul);
+			  
+			  $.each(data, function (index, el) {
+					var status;
+
+					if(el.status === true){
+						status = "style=\"background-color:green; color:white\"";
+					
+					var li = $("<li class=\"ui-block-" + blocks[el.id%5] +"\"></li>")
+					.append($("<a id=\"lot-" + lotId +"-floor-" + floorId + "-row-" + el.id + "\"" + status + " class=\"rows-a class-tab ui-link ui-btn\" href=\"#tab-lot-"
+							+lotId + "-floor-" + floorId + "-row-" + el.id + "-slots\" data-ajax=\"false\"></a>").text("Row "+ el.id));
+					ul.append(li);
+					var displayDiv = $("<div id=\"tab-lot-" + lotId + "-floor-" + floorId + "-row-" + el.id + "\"" +" class=\"ui-body-d ui-content\"></div>");
+					displayDiv.appendTo(targetDiv);
+					}
+				});
+				
+	 			$('li').on('click', 'a.rows-a', function() {
+					getSlots(this);
+				}); 
+	 			$("#tab-lot-" + lotId + "-floor-" + floorId + "-rows").tabs();
+				$("#tab-lot-" + lotId + "-floor-" + floorId + "-rows").tabs("refresh");
+				//rowsTab.tabs("refresh");
+		  },
+		  error: function(data){
+		  }
+		}); 
+
+}
+
+function getFloors(lot){
+	var lotId = $(lot).attr("id");
+	var floorsURL = baseURL + "/lot/" + lotId + "/floors";
+	$.ajax({
+	  url: floorsURL,
+	  type: "GET",
+	  contentType: "application/json",
+	  dataType: "json",
+	  success: function(data){
+		  var floorsTab = $("#tab-lot-" + lotId + "-floors"); 
+		  floorsTab.empty();
+		  var floorsNavBar = $("<div id=\"lot-" + lotId + "-floors\" data-role=\"navbar\"></div>");
+		  floorsNavBar.appendTo(floorsTab);
+		  
+		  var floorId = "lot-"+ lotId + "-floors" ;
+		  //$("#"+floorId).empty();
+		  //var div = $("#"+floorId);
+		  var ulhtml = $("<ul class=\"ui-grid-c\"></ul>");
+		  floorsNavBar.append(ulhtml);
+		  var ul= $("#"+ floorId + " ul"); 
+		  
+		  $.each(data, function (index, el) {
+				var status;
+				if(el.status === true)
+					status = "style=\"background-color:green; color:white\"";
+				else
+					status = "style=\"background-color:red; color:white\"";
+				
+				var li = $("<li class=\"ui-block-" + blocks[el.id%2] + "\"></li>")
+				.append($("<a id=\"lot-" + lotId +"-floor-"+el.id + "\"" + status + " class=\"floor-a class-tab ui-link ui-btn\" href=\"#tab-lot-"
+						+lotId + "-floor-" + el.id + "\"></a>").text((el.id == 0 ? "Ground" :"1st") +" Floor"));
+				ul.append(li);
+				var displayDiv = $("<div id=\"tab-lot-" + lotId + "-floor-" + el.id + "\"" +" class=\"ui-body-d ui-content\"></div>");
+				displayDiv.appendTo(floorsTab);
+			});
+		 
+			/* $("#tab-"+lotId).on( "tabsbeforeactivate", function( event, ui ) {
+				alert(ui.oldTab.attr("class"));
+				alert(ui.newTab.attr("class"));
+				} ); */
+ 			$('li').on('click', 'a.floor-a', function() {
+				getRows(this);
+			}); 
+				//floorsTab.tabs();
+	 			 floorsTab.tabs("refresh");
+	  },
+	  error: function(data){
+	  }
+	});
+}
+
+function getLots(){
+	var lotsURL = baseURL + "/lots";
+	$.ajax({
+		  url: lotsURL,
+		  type: "GET",
+		  contentType: "application/json",
+		  dataType: "json",
+		  success: function(data){
+			  $.each(data, function (index, el) {
+					var status;
+					$("#"+el.id).addClass(el.status ? "available" : "occupied");
+					$("#"+el.id).removeClass("noInfo");
+					
+				});
+				
+		  },
+		  error: function(data){
+		  	alert(data);
+		  }
+		});
+}
+	$(document).ready(function(){
+		$(".ui-page-theme-a").removeClass("ui-page-theme-a");
+		$.mobile.changeGlobalTheme("e");
+		$("#parking").tabs();	
+		getLots();
+		$(".class-tab").click(function(){
+				getFloors(this);
+			});
+	
+	});
+</script>
+
+</head>
+<body>
+	<div data-role="tabs" id="parking">
+		<div style="border: 1px solid black" align="center">Parking Lots</div>
+
+		<div id="lots" data-role="navbar">
+			<ul>
+				<li><a class="class-tab noInfo" id="IN" href="#tab-IN"
+					data-ajax="false">Indoor</a></li>
+				<li><a class="class-tab noInfo" id="OUT" href="#tab-OUT"
+					data-ajax="false">Outdoor</a></li>
+			</ul>
+		</div>
+		<div id="tab-IN" >
+			<div id="tab-lot-IN-floors" data-role="tabs">
+				<div id="lot-IN-floors" data-role="navbar"></div>
+			</div>
+		</div>
+		<div id="tab-OUT" >
+			<div id="tab-lot-OUT-floors" data-role="tabs">
+				<div id="lot-OUT-floors" data-role="navbar"></div>
+			</div>
+		</div>
+		<br/>
+	</div>
+</body>
+
+</html>
