@@ -1,0 +1,33 @@
+## Build
+
+The build uses Apache Maven. Simply use:
+
+```
+mvn clean install
+```
+
+## Feature and Deployment
+
+On a running Karaf instance, register the features repository using:
+
+```
+karaf@root()> feature:repo-add mvn:com.ericsson.iot/smart-parking-jpa-features/1.0-SNAPSHOT/xml
+```
+
+Then, you can install the datasource feature:
+
+```
+karaf@root()> feature:install smart-parking-jpa-mysql-datasource
+```
+
+Then, you can install the service provider feature:
+
+```
+karaf@root()> feature:install smart-parking-jpa-provider
+```
+
+And the service client feature to test JPA provider capabilities:
+
+```
+karaf@root()> feature:install smart-parking-jpa-client
+```
