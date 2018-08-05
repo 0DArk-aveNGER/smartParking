@@ -2,8 +2,9 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet"
-	href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-amber.css">
 <script src="http://code.jquery.com/jquery-2.0.1.min.js"></script>
 <script
 	src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
@@ -34,6 +35,18 @@ td{
     padding: 8px;
 }
 
+.w3column {
+    float: left;
+    width: 33.33%;
+    padding: 5px;
+}
+
+/* Clearfix (clear floats) */
+.w3row::after {
+    content: "";
+    clear: both;
+    display: table;
+}
 }
 
 </style>
@@ -265,14 +278,29 @@ function getLots(){
 </head>
 <body>
 	<div data-role="tabs" id="parking">
-		<div style="border: 1px solid black" align="center">Parking Lots</div>
-
+	<div class="w3-container w3-text-theme w3row">
+		<div  class="w3column">
+				<img  src="images/SP1.png" style="width:128px;height:128px;">
+		</div>
+		<div  class="w3column">
+			<h1>Ericsson Smart Parking</h1>
+		</div>
+		<div  class="w3column">
+			<h4 align="right">Signed in as:</h4>
+			<h1 align="right">Ali</h1>
+		</div>
+	</div>
+	<div class="w3-card-4">
+		<div  align="center" class="w3-container w3-theme w3-card">
+			<h1>Parking Lots</h1>
+		</div>
+	</div>
 		<div id="lots" data-role="navbar">
 			<ul>
 				<li><a class="class-tab noInfo" id="IN" href="#tab-IN"
-					data-ajax="false">Indoor</a></li>
+					data-ajax="false">Indoor Parking Lot</a></li>
 				<li><a class="class-tab noInfo" id="OUT" href="#tab-OUT"
-					data-ajax="false">Outdoor</a></li>
+					data-ajax="false">Outdoor Parking Lot</a></li>
 			</ul>
 		</div>
 		<div id="tab-IN" >

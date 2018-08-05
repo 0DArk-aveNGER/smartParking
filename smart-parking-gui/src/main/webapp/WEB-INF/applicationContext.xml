@@ -1,31 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-       http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
-
-  <camelContext xmlns="http://camel.apache.org/schema/spring">
-    <route id="helloRoute">
-      <!-- incoming requests from the servlet is routed -->
-      <from uri="servlet:hello"/>
-      <choice>
-        <when>
-          <!-- is there a header with the key name? -->
-          <header>name</header>
-          <!-- yes so return back a message to the user -->
-          <transform>
-             <simple>Hi I am ${sysenv.HOSTNAME}. Hello ${header.name} how are you today?</simple>
-          </transform>
-        </when>
-        <otherwise>
-          <!-- if no name parameter then output a syntax to the user -->
-          <transform>
-            <constant>Add a name parameter to uri, eg ?name=foo</constant>
-          </transform>
-        </otherwise>
-      </choice>
-    </route>
-  </camelContext>
-
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+    <camelContext id="camelContext-8c4387c8-5242-4c4b-885a-3b789cefdc6a" xmlns="http://camel.apache.org/schema/spring">
+        <route id="helloRoute">
+            <!-- incoming requests from the servlet is routed -->
+            <from id="_from1" uri="servlet:hello"/>
+            <choice id="_choice1">
+                <when id="_when1">
+                    <!-- is there a header with the key name? -->
+                    <header>name</header>
+                    <!-- yes so return back a message to the user -->
+                    <transform id="_transform1">
+                        <simple>Hi I am ${sysenv.HOSTNAME}. Hello ${header.name} how are you today?</simple>
+                    </transform>
+                </when>
+                <otherwise id="_otherwise1">
+                    <!-- if no name parameter then output a syntax to the user -->
+                    <transform id="_transform2">
+                        <constant>Add a name parameter to uri, eg ?name=foo</constant>
+                    </transform>
+                </otherwise>
+            </choice>
+        </route>
+    </camelContext>
 </beans>

@@ -22,9 +22,8 @@
     -->
     <jpa:enable/>
     <tx:enable-annotations/>
-    
-    <service id="service-smartParking" interface="com.ericsson.iot.smart.parking.jpa.ParkingSlotService" ref="parkingSlotService"/>
-    
-    <bean id="parkingSlotService" class="com.ericsson.iot.smart.parking.jpa.ParkingSlotServiceImpl" />
-    
+    <service id="service-smartParking"
+        interface="com.ericsson.iot.smart.parking.jpa.ParkingSlotService" ref="parkingSlotService"/>
+    <bean
+        class="com.ericsson.iot.smart.parking.jpa.ParkingSlotServiceImpl" id="parkingSlotService"/>
 </blueprint>
